@@ -1,0 +1,5 @@
+#!/bin/sh
+#
+# Helper to dcommit only SOME revisions from git -> svn
+
+git-gitsvnrebase && git svn dcommit && git rebase --continue

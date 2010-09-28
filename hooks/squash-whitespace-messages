@@ -1,0 +1,117 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+
+if ($#ARGV < 1 || $ARGV[1] ne "squash") {
+    # We only play with squashed commits
+    exit;
+}
+
+my $WHITESPACE_MESSAGE = "Whitespace";
+
+# Slurp in the commit message and bust it into individual pieces
+my @messages = parseSquashMessage($ARGV[0]);
+
+# Go through the commit message and see if they're all what we expect
+foreach (@messages) {
+    if ($_ ne $WHITESPACE_MESSAGE) {
+        # It wasn't my magic "Whitespace" line, so bail
+        exit;
+    }
+}
+
+# Got to the end? Then we're all golden. Let's just replace it wholesale
+print "# Squashing together $#messages whitespace commits\n\n";
+
+open(FILE, ">$ARGV[0]");
+print FILE "# Squashing together ", ($#messages + 1), " whitespace commits\n\n";
+print FILE $WHITESPACE_MESSAGE;
+close(FILE);
+
+
+# Busts apart a git squash commit message into individual chunks.
+sub parseSquashMessage
+{
+    my($filename) = @_;
+
+    open(FILE, $filename); # TODO: error handling
+
+    my $total = 0;
+    my $currentIdx = 0;
+
+    my $message = "";
+    my @messages = ();
+
+    while (<FILE>) {
+        # The first line of a stock interactive rebase squash message
+        if (/^# This is a combination of (\d+) commits./) {
+            if ($total != 0) {
+                error("Contains multiple summary lines");
+            }
+
+            $total = $1;
+
+            if ($total == 0) {
+                error("Zero commits?");
+            }
+
+            next;
+        }
+
+        if ($total == 0) {
+            error("No summary line");
+        }
+
+        # The start of a new commit message
+        if (/^# The first commit's message is:/ || /^# This is the (\d+).. commit message:/) {
+            if (defined($1)) {
+                # Convert from human numbering to zero-indexed.
+                $currentIdx = $1 - 1;
+
+                # Strip excessive newlines from the start/end of the message
+                # Add it to our list
+                push(@messages, $message);
+
+                # Clear up a space for saving more stuff
+                $message = "";
+            }
+
+            if ($currentIdx >= $total) {
+                error("More commit messages than expected");
+            }
+
+            next;
+        }
+
+        # A line starting with a pound is a comment. If it isn't a comment we recognized before,
+        # that should mean it's the normal commit msg spew and we're done with stuff.
+        if (/^#/) {
+            push(@messages, $message);
+            last;
+        }
+
+        # Otherwise, it's a normal line, so tack it onto our buffer
+        $message .= $_;
+    }
+
+    if ($#messages != $total - 1) {
+        error("Fewer commit messages than expected");
+    }
+
+    close(FILE);
+
+    # And now clean up our messages to strip off excessive whitespace from the start or end
+    foreach (0..$#messages) {
+        $messages[$_] =~ s/^\s+|\s+$//g;
+    }
+
+    return @messages;
+}
+
+# Carp and die
+sub error()
+{
+    print STDERR "Invalid squash message: @_\n";
+    exit(-1);
+}

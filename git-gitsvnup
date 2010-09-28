@@ -1,0 +1,6 @@
+#!/bin/sh
+# Convenience git function for git-svn to pull in the latest changes
+# from svn. Really, this could trivially be an alias in your .gitconfig, but
+# I've made a script just for ease of disributing it to folks
+
+git svn fetch && git svn rebase

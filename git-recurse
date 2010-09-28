@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+
+import os, subprocess, sys
+from lib.repoutils import find_all_repositories
+from lib.color import colored_print
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print """Usage: %s <git command>
+
+Runs the given git command in all directories below this one.
+""" % os.path.basename(sys.argv[0])
+        exit();
+
+    # Swap in git instead of ourselves
+    sys.argv[0] = "git"
+
+    repositories = find_all_repositories()
+
+    for ii, repo in enumerate(repositories):
+        if (ii > 0):
+            # Space it out some
+            print
+
+        display_repo = repo
+        try:
+            display_repo = os.path.relpath(repo)
+        except  (AttributeError):
+            # Bleh. relpath was added in 2.6
+            pass
+
+        colored_print('== Git repository: %s ==' % display_repo)
+        pipe = subprocess.Popen(sys.argv, cwd=repo)
+        pipe.wait()

@@ -57,5 +57,6 @@ complete git \
 'n/remote/(show add rm prune update)/' \
 'N/remote/`git remote`/' \
 'n/checkout/`__git_branches | xargs echo -b --`/' \
+'n/co/`__git_branches | xargs echo -b --`/' \
 'N/-b/`__git_branches`/'
 endif

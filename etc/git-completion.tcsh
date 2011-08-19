@@ -58,5 +58,6 @@ complete git \
 'N/remote/`git remote`/' \
 'n/checkout/`__git_branches | xargs echo -b --`/' \
 'n/co/`__git_branches | xargs echo -b --`/' \
+'n/show/`git rev-list --max-count=50 --abbrev-commit HEAD`/' \
 'N/-b/`__git_branches`/'
 endif

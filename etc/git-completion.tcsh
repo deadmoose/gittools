@@ -26,9 +26,36 @@ if ( -x /usr/bin/git) then
 
 # List of known git subcommands
 # This is a hard-coded list to avoid calling 'git help' at startup.
-set __git_cmd_names = (add bisect blame branch checkout clone commit config \
-diff diff-files difftool fetch grep gui init log merge mv pull push \
-rebase reset rm show shortlog stash status tag)
+set __git_cmd_names = ( \
+    add \
+    bisect \
+    blame \
+    branch \
+    checkout \
+    clone \
+    commit \
+    config \
+    diff \
+    diff-files \
+    difftool \
+    fetch \
+    grep \
+    gui \
+    init \
+    log \
+    merge \
+    mv \
+    pull \
+    push \
+    rebase \
+    reset \
+    rm \
+    show \
+    shortlog \
+    stash \
+    status \
+    tag \
+)
 
 alias __git_aliases 'git config --get-regexp "alias.*" | sed -n "s,alias\.\([^ ]*\).*,\1,p"'
 alias __git_branches 'git for-each-ref --format="%(refname)" refs/heads refs/remotes | sed -e s,refs/remotes/,, | sed -e s,refs/heads/,,'

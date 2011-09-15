@@ -32,6 +32,7 @@ set __git_cmd_names = ( \
     blame \
     branch \
     checkout \
+    cherry-pick \
     clone \
     commit \
     config \

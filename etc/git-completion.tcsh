@@ -56,6 +56,7 @@ set __git_cmd_names = ( \
     stash \
     status \
     tag \
+    track \
 )
 
 alias __git_aliases 'git config --get-regexp "alias.*" | sed -n "s,alias\.\([^ ]*\).*,\1,p"'
@@ -87,5 +88,7 @@ complete git \
 'n/checkout/`__git_branches | xargs echo -b --`/' \
 'n/co/`__git_branches | xargs echo -b --`/' \
 'n/show/`git rev-list --max-count=50 --abbrev-commit HEAD`/' \
-'N/-b/`__git_branches`/'
+'N/-b/`__git_branches`/' \
+'n/track/`__git_origin_branches`/'
+
 endif
